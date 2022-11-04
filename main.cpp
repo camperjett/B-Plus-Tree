@@ -31,6 +31,8 @@ public:
 	int insert(int x);
 	Node* getROOT();
 	void print();
+	int remove(int x);
+	vector<int> HISTORY;
 };
 
 /**Node Functions***/
@@ -52,14 +54,10 @@ Node* BPlusTree::getROOT(){
 }
 
 int BPlusTree::insert(int x){
+	this->HISTORY.push_back(x);
 	pair<int, Node*> data = this->ROOT->insert(x);
 	//    z    *y
 	if(data.second == NULL){
-	// this->ROOT->printNode();
-	// for (int i = 0; i < (this->ROOT->PTRS).size() && (this->ROOT->PTRS[i]); ++i)
-	// {
-	// 	this->ROOT->PTRS[i]->printNode();
-	// }
 		return 1;
 	} else{
 		/****
@@ -87,11 +85,6 @@ int BPlusTree::insert(int x){
 		newROOT->PTRS.push_back(this->ROOT); // set the right pointer as original root
 		this->ROOT = newROOT; 		   // set the new root as the root
 
-		// this->ROOT->printNode();
-	// 		for (int i = 0; i < (this->ROOT->PTRS).size() && (this->ROOT->PTRS[i]); ++i)
-	// {
-	// 	this->ROOT->PTRS[i]->printNode();
-	// }
 		return 2;
 		// STATUS 2: means GLOBAL level increase
 	}
@@ -302,13 +295,32 @@ void Node::print(){
 	cout<<"]";
 }
 
+int BPlusTree::remove(int x){
+	bool ok = false;
+	for(auto& I: this->HISTORY){
+		if(x == I) ok = true;
+	}
+	if(ok == false){
+		return 0;
+	}
+	else {
+		// delete this->ROOT;
+		this->ROOT = new Node(this->NODE_SIZE, true);
+		for(auto& I: HISTORY){
+			if(I == x || I == 0) continue;
+			this->insert(I);
+		}
+		return 1;
+	}
+}
+
 void showMenu(){
 	cout<<"\nUwU Available options : \n";
 	cout<<"* insert <value>"<<el;
 	cout<<"* exit"<<el;
 	cout<<"* display"<<el;
 	cout<<"* remove <value>"<<el;
-	cout<<"* search <value>"<<el;
+	// cout<<"* search <value>"<<el;
 	cout<<el;
 }
 int main()
@@ -339,6 +351,8 @@ int main()
     	} else if(choice == "remove"){
     		int mode;
     		cin>>value;
+    		BPT->remove(value);
+    		BPT->print();
     		
     	} else if(choice == "search"){
     		cin>>value;
